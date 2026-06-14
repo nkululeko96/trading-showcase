@@ -97,11 +97,18 @@ These cost real money to learn and shaped the engineering above:
 
 ## What's in this repo
 
-| Path | What it shows |
-|---|---|
-| [`notebooks/01_funding_rate_arbitrage.ipynb`](notebooks/01_funding_rate_arbitrage.ipynb) | Research workflow: pull public funding histories from Binance, Bybit and OKX, quantify cross-venue funding spreads, model fees and execution costs, and backtest a simple delta-neutral rotation — with honest treatment of capacity, legging risk and venue risk |
-| [`notebooks/02_short_horizon_probability_calibration.ipynb`](notebooks/02_short_horizon_probability_calibration.ipynb) | Why raw model probabilities lose money as a maker: a Brownian-bridge probability model for 5-minute BTC direction on public 1-minute data, reliability diagrams, Platt recalibration implemented from scratch, and an expected-value gate for maker quoting in a binary market |
-| [`src/showcase/reconciliation.py`](src/showcase/reconciliation.py) | Production-style code: a generic order/fill reconciler that detects post-cancel fill races, unknown fills and position drift (lesson 2 above), with unit tests |
+One research notebook per strategy surface of the production stack, each
+reproduced end-to-end on public data, executed with committed outputs:
+
+| Path | Backs which surface | What it shows |
+|---|---|---|
+| [`notebooks/01_funding_rate_arbitrage.ipynb`](notebooks/01_funding_rate_arbitrage.ipynb) | Funding arbitrage | Cross-venue funding spreads (Binance/Bybit/OKX/Hyperliquid): tier-1 CEX pairs are arbitraged out, a sign-stable structural premium survives on the newer venue, fast rotation rules churn into costs, slow structural carry works — with explicit fees and the live-ops realities the public data hides |
+| [`notebooks/02_short_horizon_probability_calibration.ipynb`](notebooks/02_short_horizon_probability_calibration.ipynb) | Binary prediction markets | A Brownian-bridge P(up) model for 5-minute BTC direction: non-monotone miscalibration (momentum mid-range, snapback tails), why Platt fails and isotonic doesn't (both from scratch), and a fill simulation showing adverse selection is ~constant per informed fill — min-edge gates and short quote TTLs are existence conditions for a maker |
+| [`notebooks/03_options_svi_black76_deribit.ipynb`](notebooks/03_options_svi_black76_deribit.ipynb) | Options | Full pricing-stack reconciliation against live Deribit ETH marks: inverse coin-quoted mechanics, Black-76 IV inversion to hundredths of a vol point chain-wide, vega-weighted multistart raw-SVI per expiry, static no-arbitrage checks, greeks reconciled to ~10⁻⁴ after empirically pinning down the venue's delta convention |
+| [`notebooks/04_whalley_wilmott_hedging.ipynb`](notebooks/04_whalley_wilmott_hedging.ipynb) | Options hedging | Whalley–Wilmott no-trade bands vs fixed-interval delta hedging on real BTC paths: WW dominates the cost–risk frontier (half the cost at matched risk), and the residual risk floor is vol misspecification — which no rebalancing schedule can hedge |
+| [`notebooks/05_hawkes_trade_arrivals.ipynb`](notebooks/05_hawkes_trade_arrivals.ipynb) | Market making | Self-exciting trade arrivals on public prints: exponential-kernel Hawkes by exact MLE (O(n) recursion, from scratch), time-change validation that also localizes what the single kernel misses, and intensity-conditional fill hazard / pickoff risk — the empirical case for intensity-dependent quoting |
+| [`notebooks/06_cross_sectional_momentum_promotion.ipynb`](notebooks/06_cross_sectional_momentum_promotion.ipynb) | Factor trading | Anatomy of a rejection: a cross-sectional momentum candidate that backtests at +36% net is dismantled by the promotion pipeline's gates — flat quintile spread, t ≈ 0.6, vol-timing artifact exposed by constant-risk implementation, in-sample Sharpe 1.3 turning negative out-of-sample |
+| [`src/showcase/reconciliation.py`](src/showcase/reconciliation.py) | Execution infrastructure | Production-style code: a generic order/fill reconciler that detects post-cancel fill races, unknown fills and position drift (lesson 2 above), with unit tests |
 
 The notebooks fetch live public data and fall back to the small cached CSVs
 committed under `data/`, so the committed outputs are reproducible offline.
